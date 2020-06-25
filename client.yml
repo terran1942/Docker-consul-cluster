@@ -1,0 +1,11 @@
+{
+  "datacenter": "dc",
+  "acl":{
+    "enabled":true,
+    "default_policy": "deny",
+    "enable_token_persistence": true,
+    "tokens":{
+      "agent":"55c5c5d2-362b-4b78-8667-4c2e44e3faeb"
+    }
+  }
+}
