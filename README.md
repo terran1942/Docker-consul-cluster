@@ -6,6 +6,7 @@ We always use the Consul for service discovery and config, but single host devel
 
 
 Build cluster by the Docker is simple, fast process, this project includes all steps of build Consul cluster fastly.
+And we will enable ACL to security access Consul cluster.
 
 Requirement:
 + Consul servers, 3 hosts.
@@ -15,26 +16,82 @@ Requirement:
 This project uses [docker](https://docs.docker.com/install/),
 check them out if you do not have them locally installed.
 
-### Consul server A
-On the server A, replace < your server IP > in consul-a.sh, then run it, the shell following:
++ Pull Consul image on every hosts, command following:
 ``` bash
-docker run -d --name consul-server --network=host -v /root/consul/data:/consul/data -v /root/consul/config:/consul/config consul:1.7 agent -server -bootstrap-expect=3 -ui -bind=<your server A IP> -client=0.0.0.0
+docker pull consul:1.7
 ```
 
-### Consul server B
-On the server B, replace < your server B IP > and < your server A IP > in 'consul-b.sh', then run it.
-```bash
-docker run -d --name consul-server --network=host -v /root/consul/data:/consul/data -v /root/consul/config:/consul/config consul:1.7 agent -server -ui -bind=<your server B IP> -client=0.0.0.0 -join=<your server A IP>
++ Replace server token in server.yml, such as following:
+``` yaml
+{
+  "datacenter": "dc",
+  "server": true,
+  "acl":{
+    "enabled":true,
+    "default_policy":"deny",
+    "down_policy":"extend-cache",
+    "enable_token_persistence":true,
+    "tokens":{
+      "master": "55c5c5d2-362b-4b78-8667-4c2e44e3faeb"
+    }
+  }
+}
 ```
 
-### Consul server C
-On the server C, execute same process with server B.
-``` bash
-docker run -d --name consul-server --network=host -v /root/consul/data:/consul/data -v /root/consul/config:/consul/config consul:1.7 agent -server -ui -bind=<your server C IP> -client=0.0.0.0 -join=<your server A IP>
++ Replace client token in client.yml, such as following:
+``` yaml
+{
+  "datacenter": "dc",
+  "acl":{
+    "enabled":true,
+    "default_policy": "deny",
+    "enable_token_persistence": true,
+    "tokens":{
+      "agent": "55c5c5d2-362b-4b78-8667-4c2e44e3faeb"
+    }
+  }
+}
 ```
 
-### Consul client
-On the client, replace < your client IP > and < your server A IP > in 'consul-client.sh', then run it connect to cluster, the shell following:
-``` bash
-docker run -d --name consul-client --network=host -v /root/consul/data:/consul/data -v /root/consul/config:/consul/config consul:1.7 agent -bind=<your client IP> -retry-join=<your server A IP>
++ Sync consul-a.sh, consul-b.sh, consul-c.sh to 3 Consul servers respectively.
++ Sync server.yml to **/root/consul/config/server.yml** in 3 Consul servers.
++ Sync client.yml to **/root/consul/config/client.yml** in any clients.
+
+### Consul servers
++ On the server A, replace **< your server IP >** in consul-a.sh, then run it.
++ On the server B, replace **< your server B IP >** and **< your server A IP >** in 'consul-b.sh', then run it.
++ On the server C, execute same process with server B.
+
+### Consul clients
+On the client, replace < your client IP > and **< your server A IP >** in 'consul-client.sh', then run it connect to cluster.
+
+## Usage
+It is recommended to install the Consul client on all microservice servers, only allow Consul client connect to Consul server cluster, then microservice connect to Consul client.
+
+In micro-services, configure Consul settings，for example in Spring Cloud bootstrap.yml:
+``` yaml
+spring:
+  application:
+    name: application
+  cloud:
+    consul:
+      enabled: true
+      host: localhost
+      port: 8500
+      discovery:
+        fail-fast: true
+        prefer-ip-address: true
+        acl-token: '55c5c5d2-362b-4b78-8667-4c2e44e3faeb'
+      config:
+        enabled: true
+        watch:
+          enabled: true
+          delay: 1000
+        format: yaml
+        acl-token: '55c5c5d2-362b-4b78-8667-4c2e44e3faeb'
 ```
+
+
+## License
+
+MIT © Yongliang Li
