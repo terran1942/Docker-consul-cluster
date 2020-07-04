@@ -22,7 +22,7 @@ docker pull consul:1.7
 ```
 
 + Replace server token in server.yml, such as following:
-``` yaml
+```json
 {
   "datacenter": "dc",
   "server": true,
@@ -36,7 +36,7 @@ docker pull consul:1.7
 ```
 
 + Replace client token in client.yml, such as following:
-``` yaml
+```json
 {
   "datacenter": "dc",
   "acl":{
@@ -95,14 +95,30 @@ Policies:
 ```
 
 #### Add the agent token to all Consul servers
-+ Add agent token to ***server.json*** ***client.json***
++ Add agent token to ***server.json***
 ```json
 {
-  "primary_datacenter": "dc1",
-  "acl": {
-    "enabled": true,
+  "datacenter": "dc",
+  "server": true,
+  "acl":{
+    "enabled":true,
+    "default_policy":"deny",
+    "down_policy":"extend-cache",
+    "enable_token_persistence":true,
+    "tokens": {
+      "agent": "da666809-98ca-0e94-a99c-893c4bf5f9eb"
+    }
+  }
+}
+```
++ Add agent token to ***client.json***
+```json
+{
+  "datacenter": "dc",
+  "acl":{
+    "enabled":true,
     "default_policy": "deny",
-    "down_policy": "extend-cache",
+    "enable_token_persistence": true,
     "tokens": {
       "agent": "da666809-98ca-0e94-a99c-893c4bf5f9eb"
     }
