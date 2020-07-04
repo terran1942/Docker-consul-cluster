@@ -7,7 +7,7 @@
     "down_policy":"extend-cache",
     "enable_token_persistence":true,
     "tokens":{
-      "master": "your token"
+      "agent": "your token"
     }
   }
 }

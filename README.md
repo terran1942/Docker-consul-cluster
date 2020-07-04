@@ -30,10 +30,7 @@ docker pull consul:1.7
     "enabled":true,
     "default_policy":"deny",
     "down_policy":"extend-cache",
-    "enable_token_persistence":true,
-    "tokens":{
-      "master": "55c5c5d2-362b-4b78-8667-4c2e44e3faeb"
-    }
+    "enable_token_persistence":true
   }
 }
 ```
@@ -45,10 +42,7 @@ docker pull consul:1.7
   "acl":{
     "enabled":true,
     "default_policy": "deny",
-    "enable_token_persistence": true,
-    "tokens":{
-      "agent": "55c5c5d2-362b-4b78-8667-4c2e44e3faeb"
-    }
+    "enable_token_persistence": true
   }
 }
 ```
@@ -58,12 +52,66 @@ docker pull consul:1.7
 + Sync client.yml to **/root/consul/config/client.yml** in any clients.
 
 ### Consul servers
-+ On the server A, replace **< your server IP >** in consul-a.sh, then run it.
+On the server A, replace **< your server IP >** in consul-a.sh, then run it.
+
+#### Create the bootstrap token
+```bash
+consul acl bootstrap
+```
+```bash
+AccessorID:       f989ff1d-6598-485c-9c46-06708ab5fdf7
+SecretID:         dbc53eec-5dde-4b70-bd28-7496831b2e65
+Description:      Bootstrap Token (Global Management)
+Local:            false
+Create Time:      2020-07-04 07:06:51.737974744 +0000 UTC
+Policies:
+   00000000-0000-0000-0000-000000000001 - global-management
+```
+#### Create agent policy
+```hcl
+node_prefix "" {
+   policy = "write"
+}
+service_prefix "" {
+   policy = "read"
+}
+```
+```bash
+consul acl policy create -name "agent-token" -description "Agent Token Policy" -rules @agent-policy.hcl
+```
+
+#### Create Consul agent token
+```bash
+consul acl token create -description "Agent Token" -policy-name "agent-token"
+```
+```bash
+AccessorID:   499ab022-27f2-acb8-4e05-5a01fff3b1d1
+SecretID:     da666809-98ca-0e94-a99c-893c4bf5f9eb
+Description:  Agent Token
+Local:        false
+Create Time:  2018-10-19 14:23:40.816899 -0400 EDT
+Policies:
+   fcd68580-c566-2bd2-891f-336eadc02357 - agent-token
+```
+
+#### Add the agent token to all Consul servers
++ Add agent token to ***server.json*** ***client.json***
+```json
+{
+  "primary_datacenter": "dc1",
+  "acl": {
+    "enabled": true,
+    "default_policy": "deny",
+    "down_policy": "extend-cache",
+    "tokens": {
+      "agent": "da666809-98ca-0e94-a99c-893c4bf5f9eb"
+    }
+  }
+}
+```
 + On the server B, replace **< your server B IP >** and **< your server A IP >** in 'consul-b.sh', then run it.
 + On the server C, execute same process with server B.
-
-### Consul clients
-On the client, replace < your client IP > and **< your server A IP >** in 'consul-client.sh', then run it connect to cluster.
++ On the client, replace < your client IP > and **< your server A IP >** in 'consul-client.sh', then run it connect to cluster.
 
 ## Usage
 It is recommended to install the Consul client on all microservice servers, only allow Consul client connect to Consul server cluster, then microservice connect to Consul client.
