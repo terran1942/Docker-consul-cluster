@@ -139,6 +139,9 @@ spring:
         acl-token: '55c5c5d2-362b-4b78-8667-4c2e44e3faeb'
 ```
 
+## Reference
++ [Bootstrap the ACL System](https://learn.hashicorp.com/consul/day-0/acl-guide#enable-acls-on-all-consul-servers)
++ [Secure Consul with ACLs](https://learn.hashicorp.com/consul/security-networking/production-acls#overview)
 
 ## License
 
