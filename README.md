@@ -21,7 +21,7 @@ check them out if you do not have them locally installed.
 docker pull consul:1.7
 ```
 
-+ Replace server token in server.yml, such as following:
++ Replace server token in server.json, such as following:
 ```json
 {
   "datacenter": "dc",
@@ -35,7 +35,7 @@ docker pull consul:1.7
 }
 ```
 
-+ Replace client token in client.yml, such as following:
++ Replace client token in client.json, such as following:
 ```json
 {
   "datacenter": "dc",
@@ -48,8 +48,8 @@ docker pull consul:1.7
 ```
 
 + Sync consul-a.sh, consul-b.sh, consul-c.sh to 3 Consul servers respectively.
-+ Sync server.yml to **/root/consul/config/server.yml** in 3 Consul servers.
-+ Sync client.yml to **/root/consul/config/client.yml** in any clients.
++ Sync server.json to **/root/consul/config/server.json** in 3 Consul servers.
++ Sync client.json to **/root/consul/config/client.json** in any clients.
 
 ### Consul servers
 On the server A, replace **< your server IP >** in consul-a.sh, then run it.
