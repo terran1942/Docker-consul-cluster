@@ -18,7 +18,7 @@ check them out if you do not have them locally installed.
 
 + Pull Consul image on every hosts, command following:
 ``` bash
-docker pull consul:1.7
+docker pull consul:1.8
 ```
 
 + Replace server token in server.json, such as following:
