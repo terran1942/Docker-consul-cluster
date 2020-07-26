@@ -52,6 +52,8 @@ docker pull consul:1.7
 + Sync client.json to **/root/consul/config/client.json** in any clients.
 
 ### Consul servers
+
+### Create the bootstrap server
 On the server A, replace **< your server IP >** in consul-a.sh, then run it.
 
 #### Create the bootstrap token
@@ -67,6 +69,8 @@ Create Time:      2020-07-04 07:06:51.737974744 +0000 UTC
 Policies:
    00000000-0000-0000-0000-000000000001 - global-management
 ```
+**Warning** Save Secret ID, AKA 'master token'
+
 #### Create agent policy
 ```hcl
 node_prefix "" {
